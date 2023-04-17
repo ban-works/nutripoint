@@ -27,7 +27,6 @@ router.post("/print_pdf", async (req, res) => {
 
   // Access the default printer and save infos
   const printerInfos = await unixPrint.getDefaultPrinter();
-console.log(printerInfos);
 
   // If no printer or printer offline, send an error to frontend
   if (

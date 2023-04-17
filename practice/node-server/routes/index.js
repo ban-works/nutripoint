@@ -4,10 +4,7 @@ var fs = require("fs");
 var path = require("path");
 var unixPrint = require("unix-print");
 
-/* GET home page. */
-router.get("/", function (req, res) {
-  res.render("index");
-});
+
 
 // GET printers status for debugging purposes
 router.get("/printers_status", async (req, res) => {

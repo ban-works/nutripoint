@@ -17,15 +17,18 @@ router.get("/printers_status", async (req, res) => {
 });
 
 router.post("/print_pdf", async (req, res) => {
+
   // If no files, send an error to frontned
   if (!req.files || req.files.length === 0) {
     res.json({ result: false, error: "Please include pdf documents to print" });
     return;
   }
 
+
   // Access the default printer and save infos
   const printerInfos = await unixPrint.getDefaultPrinter();
 console.log(printerInfos);
+
   // If no printer or printer offline, send an error to frontend
   if (
     !printerInfos ||
@@ -37,16 +40,24 @@ console.log(printerInfos);
     return;
   }
 
-  // Save the PDF files to a tmp folder
-  // I prefer to treat this as an array, in case we want to print multiple files at a time.
-  // This way it works for 1 or more documents.
-  for (let i = 0; i < req.files.fromFront.length; i++) {
-    // Create a temp fileName and save the file
+ // I prefer to treat the files as an array, in case we want to print multiple files at a time.
+// This way it works for 1 or more documents.
+// Because of this, I check if I get one or more documents to be sure to have an array to feed to the print function
+
+  let files = [];
+  if(typeof req.files.fromFront === "object"){
+    files.push(req.files.fromFront);
+  } else{
+    files = req.files.fromFront
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    // Create a temp fileName and save the file to /tmp folder
     const tmpFilePath = path.join(
       __dirname,
       `../tmp/${Math.random().toString(36).substring(7)}.pdf`
     );
-    fs.writeFileSync(tmpFilePath, req.files.fromFront[i].data, "binary");
+    fs.writeFileSync(tmpFilePath, files[i].data, "binary");
     // Print the file
     try{
       await unixPrint.print(tmpFilePath, printerInfos.printer);
